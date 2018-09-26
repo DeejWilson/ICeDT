@@ -1,22 +1,4 @@
-##########################################################################
-# PROJECT 3: Fitting Algorithm                                           #
-##########################################################################
-# PROGRAM NAME:                                                          #
-#   P3_FittingAlgorithm.R                                                #
-# PROGRAMMER:                                                            #
-#   Douglas Roy Wilson, Jr.                                              #
-# DATE CREATED:                                                          #
-#   05/22/2017                                                           #
-# LAST EDIT:                                                             #
-#   05/22/2017                                                           #
-# VERSION:                                                               #
-#   R-3.3.1                                                              #
-#------------------------------------------------------------------------#
-# DESCRIPTION:                                                           #  
-#   The following functions use the modular fit pieces to describe       #
-#   and conduct the proposed fit algorithm for project 3 - examine       #
-#   immune cell type abundance from within a bulk tumor tissue.          #
-##########################################################################
+
 meanFun <- function(x,group){
   out = tapply(X = x,INDEX = group,FUN = mean)
   return(out)
@@ -28,48 +10,6 @@ varFun <- function(x,group){
 }
 
 
-#------------------------------------------------------------------------#
-# ASICeD_fit                                                             #
-#------------------------------------------------------------------------# 
-# INPUT:
-#========================================================================#
-# VARIABLE       |   RANGE    | DESCRIPTION                              #
-#========================================================================#
-#       Y        |  [0,Inf]   | TReC and Genomic Feature length          #
-#                |            | corrected expression for each bulk       #
-#                |            | tumor sample. Matrix of size nG x nS.    #
-#----------------|------------|------------------------------------------#
-#       X        |  [0,Inf]   | TReC and Genomic Feature length          #
-#                |            | corrected expression for each pure       #
-#                |            | reference sample. Matrix of size         #
-#                |            | nG x nP                                  #
-#----------------|------------|------------------------------------------#
-#   cellType     | {1,2,..,K} | Vector of length nP describing cell-     #
-#                |    -or-    | type of each column of matrix X. Order   #
-#                |{CT1,..,CTK}| must match that found in the matrix X.   #
-#----------------|------------|------------------------------------------#
-#    fixedCT     | {1,2,..,K} | Single value matching one of the labels  #
-#                |    -or-    | in cellType that identifies the tumor    #
-#                |{CT1,..,CTK}| samples used for "references." If NULL,  #
-#                |            | all cell type proportions are estimated  #
-#                |            | and it is assumed all cell types have    #
-#                |            | purified references.                     #
-#----------------|------------|------------------------------------------#
-#  fixedCT_rho   | [0.0,1.0]  | Vector of length nS recording the tumor  #
-#                |            | purity of each mixture sample. Order     #
-#                |            | must match column order in Y.            #
-#----------------|------------|------------------------------------------#
-#     PurCO      | [0.0,1.0]  | In order to initialize a pure sample     #
-#                |            | reference for the fixed cell type, we    #
-#                |            | will incorporate all pure samples of this#
-#                |            | type as well as all mixtures with a      #
-#                |            | fixedCT_rho>PurCO. Recommended >= .90    #
-#----------------|------------|------------------------------------------#
-#   borrow4SD    | TRUE/FALSE | Indicator of whether or not to borrow    #
-#                |            | information across cell types in order   #
-#                |            | to estimate Std Dev in pure references.  #
-#========================================================================#
-#
 # OUTPUT:
 #========================================================================#
 # VARIABLE       | DESCRIPTION                                           #

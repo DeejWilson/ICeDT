@@ -23,8 +23,8 @@ A matrix of normalized reference sample expression profiles of dimensions nG by 
   \item{cellType}{
 A vector indicating the immune cell identities of the expression profiles contained in X. It must be of length nP and its order must match the order of the columns of X.
 }
-  \item{fixedCT}{
-This parameter dictates which label used by cellType indicates the cell type for which cell type proportion information is known. 
+  \item{fixedCT}{ 
+The cell type poportion information may be known for one of the cell types (e.g., the proportion tumor cells). If fixedCT is a scalar, it should match one of the labels in \code{cellType} to indicate the cell type with known proportons. If fixedCT is NULL, all cell type proportions are estimated and it is assumed all cell types have purified references.
 }
   \item{fixedCT_rho}{
 Vector of length nS which contains the cell type proportion for fixedCT for each sample. Order must match that given in the columns of Y.
@@ -39,7 +39,7 @@ Indicator (TRUE/FALSE) of whether or not to borrow information across cell types
 Maximum number of iterations used for updating proportion parameters within a single EM iteration.
 }
   \item{maxIter_PP}{
-Maximum number of iterations used for updating 
+Maximum number of iterations used for updating posterior probabilities. 
 }
   \item{RhoConv_CO}{
 The maximum difference in estimated cell type proportions for defining convergence.
@@ -56,37 +56,31 @@ In order to utilize this function, one must create at least two dummy "pure" tum
 \value{
 A list item containing:
 
-- $IC_Abundance : One row per subject, one column per cell type containing ICeD-T estimates.
+- IC_Abundance: A matrix of estimated immune cell type abundances. One row per subject, one column per cell type.
 
-- $Fixed_CellType: The label defining the fixed cell type.
+- Fixed_CellType: The label defining the fixed cell type.
 
-- $Sigma2M : The estimated variance parameter for consistent marker genes. One parameter for each subject in the order specified in IC_Abundance rows. 
+- Sigma2M: The estimated variance parameter for consistent marker genes. One parameter for each subject in the order specified in IC_Abundance rows. 
 
-- $Sigma2A : The estimated variance parameter for Aberrant genes. One parameter for each subject in the order specified in IC_Abundance rows. If Sigma2A > Sigma2M for a subject, this indicates that these parameters must be switched, as must P_Consistent and PP_Consistent.
+- Sigma2A: The estimated variance parameter for Aberrant genes. One parameter for each subject in the order specified in IC_Abundance rows. If Sigma2M > Sigma2A for a subject, this indicates that these parameters must be switched, so does the values of P_Consistent and PP_Consistent.
 
-- $Z : The utilized reference matrix with one row per gene and one column per immune cell type in fixedCT. 
+- Z: The utilized reference matrix with one row per gene and one column per immune cell type in fixedCT. 
 
-- $CT_Var: The variance profiles of the established immune cell types from purified reference samples.
+- CT_Var: The variance profiles of the established immune cell types from purified reference samples.
 
-- $P_Consistent: The estimated proportion of consistent genes, one value for each subject in the order established by IC_Abundance. If Sigma2M > Sigma2A and one is interested in Aberrant genes, "P_Consistent" must be replaced by 1-P_Consistent for such subjects. 
+- P_Consistent: The estimated proportion of consistent genes, one value for each subject in the order established by IC_Abundance. If Sigma2M > Sigma2A and one is interested in Aberrant genes, "P_Consistent" must be replaced by 1-P_Consistent for such subjects. 
 
-- $PP_Consistent: A matrix of conditional probabilities that a given gene is Aberrant given the model estimates (one row per gene, one column per subject). For subjects where Sigma2M > Sigma2A, the corresponding column of PP_Consistent must be replaced by 1-PP_Consistent.
+- PP_Consistent: A matrix of conditional probabilities that a given gene is Aberrant given the model estimates (one row per gene, one column per subject). For subjects where Sigma2M > Sigma2A, the corresponding column of PP_Consistent must be replaced by 1-PP_Consistent.
 
 }
 \references{
-Wilson, Douglas R; Sun, Wei; Ibrahim, Joseph G. "ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns" <<In Review>>, 2018.
+Wilson, Douglas R; Ibrahim, Joseph G.; Sun, Wei "ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns" <<In Review>>, 2018.
 }
 \author{
 Douglas Roy Wilson, Jr.
 }
 \note{
 Please note the addition of "dummy" pure tumor expression profiles. Additionally, note the proper treatment of $P_Consistent and $PP_Consistent if Sigma2M > Sigma2A for any subject. 
-}
-
-\seealso{
-}
-\examples{
-
 }
 
 \keyword{ Expression Deconvolution}

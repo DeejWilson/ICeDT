@@ -1,7 +1,7 @@
 Package: ICEDT
 Type: Package
 Title: Immune Cell Expression Deconvolution in Tumor Tissues (ICeD-T)
-Version: 1.0
+Version: 0.99
 Date: 2018-06-08
 Author: Douglas Roy Wilson, Jr.
 Maintainer: Wei Sun <wsun@fredhutch.org>

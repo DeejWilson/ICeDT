@@ -19,14 +19,9 @@ Douglas Roy Wilson, Jr.
 Maintainer: Wei Sun <wsun@fredhutch.org>
 }
 \references{
-Wilson, Douglas R; Sun, Wei; Ibrahim, Joseph G. "ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns" <<In Review>>, 2018.
+Wilson, Douglas R; Ibrahim, Joseph G.; Sun, Wei "ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns" <<In Review>>, 2018.
 }
 \keyword{ package }
 \keyword{ Expression Deconvolution }
 \keyword{ Tumor }
-\seealso{
 
-}
-\examples{
-
-}

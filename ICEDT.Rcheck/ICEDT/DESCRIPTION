@@ -1,0 +1,12 @@
+Package: ICEDT
+Type: Package
+Title: Immune Cell Expression Deconvolution in Tumor Tissues (ICeD-T)
+Version: 0.99
+Date: 2018-06-08
+Author: Douglas Roy Wilson, Jr.
+Maintainer: Wei Sun <wsun@fredhutch.org>
+Description: Immune cell Composition estimation in Tumor Samples accounting for Aberrant Gene Behavior.
+Depends: alabama
+License: GPL (>= 2)
+Packaged: 2018-06-11 18:05:17 UTC; Douglas
+Built: R 3.5.0; ; 2018-09-26 04:31:11 UTC; unix

@@ -76,7 +76,7 @@
   
 }
 \references{
-  Wilson, Douglas R; Sun, Wei; Ibrahim, Joseph G. ''ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns'' <<In Review>>, 2018.
+  Wilson, Douglas R; Ibrahim, Joseph G.; Sun, Wei ''ICED-T Provides Accurate Estimates of Immune Cell Abundance in Tumor Samples by Allowing for Aberrant Gene Expression Patterns'' <<In Review>>, 2018.
 }
 \author{
   Douglas Roy Wilson, Jr.
@@ -85,10 +85,5 @@
   Additionally, note the proper treatment of $P_Consistent and $PP_Consistent if Sigma2M > Sigma2A for any subject. 
 }
 
-  \seealso{
-  }
-\examples{
-
-}
 \keyword{ Expression Deconvolution }
 

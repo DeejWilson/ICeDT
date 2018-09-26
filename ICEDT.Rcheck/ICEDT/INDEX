@@ -1,0 +1,7 @@
+ICEDT-package           ICeD-T
+ICeDT_fit_Wgt_suppRef   ICeD-T Model Fit (Weights, Supplied Reference)
+ICeDT_fit_noWgt_noRef   ICeD-T Model Fit (No Weights, No Supplied
+                        Reference)
+ICeDT_fit_noWgt_suppRef
+                        ICeD-T Model Fit (No Weights, Supplied
+                        Reference)
