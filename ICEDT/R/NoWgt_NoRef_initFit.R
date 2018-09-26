@@ -42,17 +42,18 @@
 #-------------------------------------------------------------------#
 #     rho       | Estimate of subject's cell type abundance profile #
 #-------------------------------------------------------------------#
-lmInit<-function(yr,Zm,Zt){
+
+lmInit<-function(yr, Zm, Zt){
   eta = yr[1]
   y   = yr[-c(1)]
   
   if(is.null(Zt)){
-    offVal = rep(0,length(y))
+    offVal = rep(0, length(y))
   } else {
     offVal = Zt*eta
   }
   
-  initMod = lm(y~Zm,offset=offVal)
+  initMod = lm(y~Zm, offset=offVal)
   
   rho  = coef(initMod)[-1]
   wneg = which(rho<0.01)
@@ -65,7 +66,8 @@ lmInit<-function(yr,Zm,Zt){
 #-------------------------------------------------------------------#
 # UTILITY FUNCTION 2: Aberrant Profile Init                         #
 #-------------------------------------------------------------------#
-AbProf_Init <- function(x,Z,nG,Qval){
+
+AbProf_Init <- function(x, Z, nG, Qval){
   Y      = x[c(1:nG)]
   logY   = log(Y)
   rho    = x[c((nG+1):(nG+Qval))]
@@ -74,17 +76,21 @@ AbProf_Init <- function(x,Z,nG,Qval){
   #eta_ij = Z%*%c(rho_i0,rho)
   eta_ij = Z%*%c(0,rho)
   
-  resid = Y-eta_ij
+  resid = Y - eta_ij
   Q3val = quantile(abs(resid),probs = c(0.75))
   g2use = which(abs(resid)>Q3val)
   
   init_val = c(0,0)
   
-  init_val[1] = HS_Sigma2_Update(logY = logY[-c(g2use)],eta_ij = eta_ij[-c(g2use)],
-                                 EM_wgt = rep(1,(nG-length(g2use))),AB_Up = FALSE)
-  init_val[2] = HS_Sigma2_Update(logY = logY[c(g2use)],eta_ij = eta_ij[c(g2use)],
-                                 EM_wgt = rep(0,length(g2use)),AB_Up = TRUE)
+  # COMMENT: is g2use the initial set of abberant genes? what are init_val?
+  init_val[1] = HS_Sigma2_Update(logY = logY[-c(g2use)], 
+                                 eta_ij = eta_ij[-c(g2use)],
+                                 EM_wgt = rep(1,(nG-length(g2use))), 
+                                 AB_Up = FALSE)
   
-  
+  init_val[2] = HS_Sigma2_Update(logY = logY[c(g2use)], 
+                                 eta_ij = eta_ij[c(g2use)], 
+                                 EM_wgt = rep(0,length(g2use)), 
+                                 AB_Up = TRUE)
   return(init_val)
 }

@@ -1,19 +1,19 @@
 
 meanFun <- function(x, group){
-  out = tapply(X = x,INDEX = group,FUN = mean)
+  out = tapply(X = x, INDEX = group, FUN = mean)
   return(out)
 }
 
 varFun <- function(x, group){
-  out = tapply(X = x,INDEX = group,FUN = var)
+  out = tapply(X = x, INDEX = group, FUN = var)
   return(out)
 }
 
-
-ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL, 
-                                  fixedCT_rho=NULL,useRho=FALSE, 
+# COMMENT: why it is noRef, when X is given?
+ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL, 
+                                  fixedCT_rho = NULL, useRho = FALSE, 
                                   borrow4SD = TRUE, maxIter_prop = 100, 
-                                  maxIter_PP=100, RhoConv_CO = 1e-4, 
+                                  maxIter_PP = 100, RhoConv_CO = 1e-4, 
                                   Subj_CO){
   
   #-----------------------------------------------------#
@@ -28,29 +28,29 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL,
     message("WARNING: No Fixed Cell Type Present!
             All Proportions will be estimated.")
   } else {
-    if(!(fixedCT%in%unique(cellType))){
+    if(!(fixedCT %in% unique(cellType))){
       stop("Specified fixed cell type label is not
            present in cellType vector!")
     }
     
-    if(ncol(Y)!=length(fixedCT_rho)){
+    if(ncol(Y) != length(fixedCT_rho)){
       stop("Mixture Expressions and Tumor Purity
            mismatch - Different Number of Subjects!")
-    } else if(!all(colnames(Y)==names(fixedCT_rho))){
+    } else if(!all(colnames(Y) == names(fixedCT_rho))){
       stop("Mixture Expression and Tumor Purity 
            mismatch! -- Different order of subjects or labels incorrect.")
     }
   }
   
-  if(ncol(X)!=length(cellType)){
-    stop("Number of cell type labels does
+  if(ncol(X) != length(cellType)){
+    stop("Number of cell type labels does 
          not match the number of samples in pure references!")
   }
   
   SampTable = table(cellType)
   
   if(min(SampTable)<2){
-    stop("At least two pure samples are needed
+    stop("At least two pure samples are needed 
          for each cell type.")
   }
   
@@ -59,8 +59,7 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL,
   #-----------------------------------------------------#
   # Assumes some pure tumor subjects! If this is not met,
   # then the program is stopped above and user is counseled.
-  # I will need to edit this for the case that there are 
-  # no such subjects. 
+
   nnct = tapply(cellType,cellType,length)
   ntot = sum(nnct)
   
@@ -76,15 +75,20 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL,
   #-----------------------------------------------------#
   # Remnant code which should not influence estimation as
   # seen later. It is not adjusted for the sake of 
-  logX = log(X)
   
-  CT_MU  = t(apply(X = logX,MARGIN = 1,FUN = meanFun,
+  # COMMENT: for the sake of what?
+  # COMMENT: what if some X is 0?
+  logX = log(X) 
+  
+  CT_MU  = t(apply(X = logX, MARGIN = 1, FUN = meanFun, 
                    group = cellType))
-  CT_VAR = t(apply(X = logX,MARGIN = 1,FUN = varFun,
+  
+  CT_VAR = t(apply(X = logX, MARGIN = 1, FUN = varFun,
                    group = cellType))
   
   
   #------------------ Quick Check ----------------------#
+  
   if(any(colnames(CT_MU)!=sortCT)){
     message("Problems with tapply order!")
   }
@@ -100,24 +104,25 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL,
   #----------------- Borrow For SD ---------------------#
   if(borrow4SD){
     X1 = logX
-    ntot_p = length(cellType)-length(which(cellType==fixedCT))
+    ntot_p = length(cellType) - length(which(cellType==fixedCT))
+    
     for(i in 1:Qp1){
-      if(sortCT[i]==fixedCT){next}
+      if(sortCT[i] == fixedCT){ next }
       wwi = which(cellType == sortCT[i])
       X1[,wwi] = logX[,wwi] - CT_MU[,i]
     }
+    
     varXPop = apply(X1[,-which(cellType==fixedCT)], 1, var)
     
     for(i in 1:Qp1){
-      if(sortCT[i]==fixedCT){next}
+      if(sortCT[i] == fixedCT){ next }
       wi = (nnct[i])/(ntot_p)
       CT_VAR[,i] = wi*CT_VAR[,i] + (1-wi)*varXPop
     }
   }
   
   #----------------- Correct Order ---------------------#
-  # Rearrange order so that fixed cell type (tumor) is
-  # first.
+  # Rearrange order so that fixed cell type (tumor) is the first one
   fIdx   = which(colnames(CT_MU)==fixedCT)
   CT_MU  = cbind(CT_MU[,fIdx],CT_MU[,-c(fIdx)])
   CT_VAR = cbind(CT_VAR[,fIdx],CT_VAR[,-c(fIdx)])
@@ -131,16 +136,16 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL,
   Z_1      = exp(CT_MU+CT_VAR/2)
   
   # Edit to ensure tumor contribution is 0
-  Z_1[,1] = rep(0,nG)
+  Z_1[,1] = rep(0, nG)
   
   #----------- Mixture Sample Proportions --------------#
-  P_Est = apply(X = rbind(fixedCT_rho,Y),MARGIN = 2,FUN = lmInit,
-                Zm=Z_1[,-c(1)],Zt=Z_1[,1])
+  P_Est = apply(X = rbind(fixedCT_rho,Y), MARGIN = 2, FUN = lmInit,
+                Zm=Z_1[,-c(1)], Zt=Z_1[,1])
   Rho_1 = P_Est
   
   #----------- Aberrant Profile Initial ----------------#
-  SigmaInit = apply(X = rbind(Y,Rho_1,fixedCT_rho),MARGIN=2,
-                    FUN=AbProf_Init,Z = Z_1,nG = nG,Qval = (ncol(Z_1)-1))
+  SigmaInit = apply(X = rbind(Y, Rho_1, fixedCT_rho), MARGIN=2,
+                    FUN = AbProf_Init, Z = Z_1, nG = nG, Qval = (ncol(Z_1)-1))
   
   Sigma2M_1 = SigmaInit[1,]
   Sigma2A_1 = SigmaInit[2,]

@@ -1,17 +1,7 @@
-#####################################################################
-# PROJECT 3: Update Functions (HOMOSCEDASTIC)                       #
-#####################################################################
-# PROGRAM NAME:                                                     #
-#   P3_UpdateFunctions.R                                            #
-# PROGRAMMER:                                                       #
-#   Douglas Roy Wilson, Jr.                                         #
-# DATE CREATED:                                                     #
-#   5/22/2017                                                       #
-# LAST EDIT:                                                        #
-#   5/22/2017                                                       #
-# VERSION:                                                          #
-#   R-3.3.1                                                         #
+
 #-------------------------------------------------------------------#
+# Update Functions (HOMOSCEDASTIC)                                  # 
+#                                                                   #
 # DESCRIPTION:                                                      #
 #   Contains all functions necessary for the update of the model    #
 #   parameters, in the following order:                             #
@@ -19,15 +9,14 @@
 #       (2) Pooled/Scaled Aberrant Marker Profile                   #
 #       (3) Cancer Profile                                          #
 #       (4) EM Weights (Posterior Means)                            #
-#####################################################################
+#-------------------------------------------------------------------#
 
 #-------------------------------------------------------------------#
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 #                SECTION 1 - Update Proportions                     #
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 #-------------------------------------------------------------------#
 #------------------------ Support Functions ------------------------#
-correctRho <- function(est,total){
+
+correctRho <- function(est, total){
   rho  = est
   wneg = which(rho<0.005)
   rho[wneg] = 0.005
@@ -45,8 +34,8 @@ correctRho_v2 <- function(est){
   return(rho)
 }
 
-extractFunction<-function(compList,element){
-  out = mapply(compList,FUN = function(x){get(element,x)})
+extractFunction <- function(compList, element){
+  out = mapply(compList, FUN = function(x){ get(element, x) })
   return(out)
 }
 
@@ -74,7 +63,8 @@ extractFunction<-function(compList,element){
 #
 # EM_wgt = (1_{T1=1},...,1_{TG=1})
 
-# HS_HessFunc<-function(rho,logY,rho_i0,Z,Zm,eta_ij,Sigma2,Sigma2A,EM_wgt,debugInd=FALSE){
+# HS_HessFunc <- function(rho, logY, rho_i0, Z, Zm, eta_ij, Sigma2, Sigma2A, 
+#                         EM_wgt, debugInd=FALSE){
 #   rho  = c(rho_i0,rho)
 #   
 #   if(debugInd==TRUE){
@@ -97,7 +87,9 @@ extractFunction<-function(compList,element){
 
 #----------------------- Gradient Functions ------------------------#
 # Z is still composed of a vector for "tumor" and everything else.
-HS_GradFunc_noFix <- function(x,logY,rho_i0,Z,Z_star,Sigma2,Sigma2A,EM_wgt){
+
+HS_GradFunc_noFix <- function(x, logY, rho_i0, Z, Z_star, Sigma2, Sigma2A, 
+                              EM_wgt){
   rho = c(0,x)
   
   eta_ij = Z%*%rho
