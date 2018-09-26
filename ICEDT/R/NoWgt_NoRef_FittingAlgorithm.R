@@ -10,41 +10,18 @@ varFun <- function(x,group){
 }
 
 
-# OUTPUT:
-#========================================================================#
-# VARIABLE       | DESCRIPTION                                           #
-#========================================================================#
-# $IC_Abundance  | Estimated immune cell type abundances (also contains  #
-#                | tumor purity estimates provided by user). Matrix of   #
-#                | size nS x (K+1).                                      #
-#----------------|-------------------------------------------------------#
-# $LogExp_Mean   | Estimated mean expression profile for each cell type  #
-#                | on the log scale. This includes the tumor/fixed cell  #
-#                | type expression profile. Matrix of size nG x (K+1).   #
-#----------------|-------------------------------------------------------#
-# $LogExp_StdDev | Estimated standard deviation of expression for each   #
-#                | cell type on the log scale. This includes the tumor/  #
-#                | fixed cell type. Matrix of size nG x (K+1).           #
-#----------------|-------------------------------------------------------#
-# $Fixed_CellType| The label of the tumor/fixed cell type specified by   #
-#                | the user. Equals "None" if the user did not provide   #
-#                | a fixed cell type.                                    #
-#----------------|-------------------------------------------------------#
-# $Convg_Ind     | Indicator of convergence status of the fit procedure: #
-#                |     0 - Convergence                                   #
-#                |     1 -                                               #
-#                |     2 -                                               #
-#========================================================================#
-
-ICeDT_fit_noWgt_noRef<-function(Y,X,cellType,fixedCT=NULL,fixedCT_rho=NULL,useRho=FALSE,
-                     borrow4SD = TRUE,maxIter_prop = 100,
-                     maxIter_PP=100,RhoConv_CO = 1e-4, Subj_CO){
+ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT=NULL, 
+                                  fixedCT_rho=NULL,useRho=FALSE, 
+                                  borrow4SD = TRUE, maxIter_prop = 100, 
+                                  maxIter_PP=100, RhoConv_CO = 1e-4, 
+                                  Subj_CO){
+  
   #-----------------------------------------------------#
   # Check Input                                         #
   #-----------------------------------------------------#
+  
   if(nrow(Y)!=nrow(X)){
-    stop("Expression Inputs do not have same
-         number of genes!")
+    stop("Expression Inputs do not have the same number of genes!")
   }
   
   if(is.null(fixedCT)){
