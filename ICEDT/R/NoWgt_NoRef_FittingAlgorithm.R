@@ -1,10 +1,10 @@
 
-meanFun <- function(x,group){
+meanFun <- function(x, group){
   out = tapply(X = x,INDEX = group,FUN = mean)
   return(out)
 }
 
-varFun <- function(x,group){
+varFun <- function(x, group){
   out = tapply(X = x,INDEX = group,FUN = var)
   return(out)
 }
