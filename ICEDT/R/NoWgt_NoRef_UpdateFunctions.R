@@ -39,96 +39,51 @@ extractFunction <- function(compList, element){
   return(out)
 }
 
-#------------------------ Hessian Functions ------------------------#
-# <Matrix Descriptions for multiple Functions>
-# rho    = (rho_{i,1},...,rho_{i,Q})
-#
-# logY   = (log[y_i1],...,log[y_iG])
-#
-# Z      = [Gamma_{01},  Gamma_{11},   ....   ....  .... Gamma_{Q1}]
-#          [Gamma_{02},  Gamma_{12},   ....   ....  .... Gamma_{Q2}]
-#          [    .                       .                          ]
-#          [    .                              .                   ]
-#          [    .                                    .             ]
-#          [Gamma_{0G},  Gamma_{1G},   ....   ....  .... Gamma_{QG}]
-#
-# Zm     = [Gamma_{11},   ....   ....  .... Gamma_{Q1}]
-#          [Gamma_{12},   ....   ....  .... Gamma_{Q2}]
-#          [    .          .                          ]
-#          [    .                 .                   ]
-#          [    .                       .             ]
-#          [Gamma_{1G},   ....   ....  .... Gamma_{QG}]
-#
-# rho_i0 = Tumor Purity
-#
-# EM_wgt = (1_{T1=1},...,1_{TG=1})
-
-# HS_HessFunc <- function(rho, logY, rho_i0, Z, Zm, eta_ij, Sigma2, Sigma2A, 
-#                         EM_wgt, debugInd=FALSE){
-#   rho  = c(rho_i0,rho)
-#   
-#   if(debugInd==TRUE){
-#     eta_ij = NULL
-#     eta_ij = Z%*%rho
-#   }
-#   mu_ij  = log(eta_ij)-Sigma2/2
-#   mu_ijA = log(eta_ij)-Sigma2A/2
-#   dij    = logY-mu_ij
-#   dij_A  = logY-mu_ijA
-#   
-#   c1  = drop(EM_wgt/((eta_ij^2)*Sigma2)) 
-#   c2  = drop((1-EM_wgt)/(Sigma2A*(eta_ij^2)))
-#   
-#   #---- Aberrant Mixed In ----#
-#   out = -t(Zm)%*%(c1*(diag(drop(1+dij)))+c2*diag(drop(1+dij_A)))%*%Zm
-#   
-#   return(out)
-# }
-
 #----------------------- Gradient Functions ------------------------#
 # Z is still composed of a vector for "tumor" and everything else.
 
 HS_GradFunc_noFix <- function(x, logY, rho_i0, Z, Z_star, Sigma2, Sigma2A, 
                               EM_wgt){
-  rho = c(0,x)
+  rho = c(0, x)
   
   eta_ij = Z%*%rho
   
-  mu_ijM = log(eta_ij)-Sigma2/2
-  d_ijM  = logY-mu_ijM
+  mu_ijM = log(eta_ij) - Sigma2/2
+  d_ijM  = logY - mu_ijM
   
-  mu_ijA = log(eta_ij)-Sigma2A/2
-  d_ijA  = logY-mu_ijA
+  mu_ijA = log(eta_ij) - Sigma2A/2
+  d_ijA  = logY - mu_ijA
   
-  c1 = c(d_ijM*EM_wgt/(Sigma2*eta_ij))+c(d_ijA*(1-EM_wgt)/(Sigma2A*eta_ij))
+  c1 = c(d_ijM*EM_wgt/(Sigma2*eta_ij)) + c(d_ijA*(1-EM_wgt)/(Sigma2A*eta_ij))
   
-  out = t(Z[,-c(1)])%*%matrix(c1,ncol=1)
+  out = t(Z[,-c(1)]) %*% matrix(c1,ncol=1)
   
   return(out)
 }
 
-HS_GradFunc_Fix <- function(x,logY,rho_i0,Z,Z_star,Sigma2,Sigma2A,EM_wgt){
-  rho = c(x,1-rho_i0-sum(x))
-  rho = c(0,rho)
+HS_GradFunc_Fix <- function(x, logY, rho_i0, Z, Z_star, Sigma2, Sigma2A, 
+                            EM_wgt){
+  rho = c(x, 1 - rho_i0 -sum(x))
+  rho = c(0, rho)
   
   eta_ij = Z%*%rho
   
-  mu_ijM = log(eta_ij)-Sigma2/2
+  mu_ijM = log(eta_ij) - Sigma2/2
   d_ijM  = logY - mu_ijM
   
-  mu_ijA = log(eta_ij)-Sigma2A/2
+  mu_ijA = log(eta_ij) - Sigma2A/2
   d_ijA  = logY - mu_ijA
   
-  c1 = c(d_ijM*EM_wgt/(Sigma2*eta_ij))+c(d_ijA*(1-EM_wgt)/(Sigma2A*eta_ij))
+  c1 = c(d_ijM*EM_wgt/(Sigma2*eta_ij)) + c(d_ijA*(1-EM_wgt)/(Sigma2A*eta_ij))
     
-  out = t(Z_star)%*%matrix(c1,ncol=1)
+  out = t(Z_star) %*% matrix(c1,ncol=1)
     
   return(out)
 }
 
 #-------------------------- Sigma Updates --------------------------#
-HS_Sigma2_Update<-function(logY,eta_ij,EM_wgt,AB_Up=FALSE){
-  varTheta_ij = logY-log(eta_ij)
+HS_Sigma2_Update <- function(logY, eta_ij, EM_wgt, AB_Up=FALSE){
+  varTheta_ij = logY - log(eta_ij)
   if(AB_Up==FALSE){
     Sigma2_Up = 2*(sqrt((sum(EM_wgt*(varTheta_ij^2))/sum(EM_wgt))+1)-1)
   } else {
@@ -139,49 +94,54 @@ HS_Sigma2_Update<-function(logY,eta_ij,EM_wgt,AB_Up=FALSE){
 }
 
 #----------------- Likelihood (No Fixed) ----------------------#
-hin_func_noFix<-function(x,rho_i0,...){
+
+hin_func_noFix <- function(x, rho_i0, ...){
   return(c(x-0.005,1-sum(x)-0.005))
 }
 
-hin_jacob_noFix <-function(x,rho_i0,...){
+hin_jacob_noFix <- function(x, rho_i0, ...){
   return(rbind(diag(1,length(x)),rep(-1,length(x))))
 }
 
-HS_ComputeLik_noFix<-function(x,logY,rho_i0,Z,Z_star,Sigma2,Sigma2A,EM_wgt){
-  rho  = c(0,x)
+HS_ComputeLik_noFix <- function(x, logY, rho_i0, Z, Z_star, Sigma2, 
+                                Sigma2A, EM_wgt){
+  rho  = c(0, x)
   
-  eta_ij = Z%*%rho
-  mu_ijM = log(eta_ij)-Sigma2/2
-  mu_ijA = log(eta_ij)-Sigma2A/2
+  eta_ij = Z %*% rho
+  mu_ijM = log(eta_ij) - Sigma2/2
+  mu_ijA = log(eta_ij) - Sigma2A/2
   
-  out = sum(EM_wgt*dnorm(x = logY,mean = mu_ijM,sd = sqrt(Sigma2),log = TRUE))+
-    sum((1-EM_wgt)*dnorm(x = logY,mean = mu_ijA,sd = sqrt(Sigma2A),log = TRUE))
+  out = sum(EM_wgt*dnorm(x = logY, mean = mu_ijM, sd = sqrt(Sigma2), log = TRUE)) + 
+    sum((1-EM_wgt)*dnorm(x = logY, mean = mu_ijA, sd = sqrt(Sigma2A), log = TRUE))
+  
   return(out)
 }
 
-#----------------- Likelihood (No Fixed) ----------------------#
-hin_func_Fix<-function(x,rho_i0,...){
-  return(c(x-0.005,1-rho_i0-sum(x)-0.005))
+#----------------- Likelihood (Fixed) ----------------------#
+hin_func_Fix <- function(x, rho_i0, ...){
+  return(c(x-0.005, 1-rho_i0-sum(x)-0.005))
 }
 
-hin_jacob_Fix <-function(x,rho_i0,...){
-  return(rbind(diag(1,length(x)),rep(-1,length(x))))
+hin_jacob_Fix <-function(x, rho_i0, ...){
+  return(rbind(diag(1,length(x)), rep(-1,length(x))))
 }
 
-HS_ComputeLik_Fix<-function(x,logY,rho_i0,Z,Z_star,Sigma2,Sigma2A,EM_wgt){
-  rho  = c(0,x,1-rho_i0-sum(x))
+HS_ComputeLik_Fix <- function(x, logY, rho_i0, Z, Z_star, Sigma2, 
+                              Sigma2A, EM_wgt){
+  rho  = c(0, x, 1-rho_i0-sum(x))
   
-  eta_ij = Z%*%rho
-  mu_ijM = log(eta_ij)-Sigma2/2
-  mu_ijA = log(eta_ij)-Sigma2A/2
+  eta_ij = Z %*% rho
+  mu_ijM = log(eta_ij) - Sigma2/2
+  mu_ijA = log(eta_ij) - Sigma2A/2
   
-  out = sum(EM_wgt*dnorm(x = logY,mean = mu_ijM,sd = sqrt(Sigma2),log = TRUE))+
-        sum((1-EM_wgt)*dnorm(x = logY,mean = mu_ijA,sd = sqrt(Sigma2A),log = TRUE))
+  out = sum(EM_wgt*dnorm(x = logY, mean = mu_ijM, sd = sqrt(Sigma2), log = TRUE)) + 
+    sum((1-EM_wgt)*dnorm(x = logY, mean = mu_ijA, sd = sqrt(Sigma2A), log = TRUE))
+  
   return(out)
 }
 
 #------------------- Actual Update Functions ------------------------#
-HS_UpdatePropn_Single <- function(x,Z,nCell,nG,maxIter_prop,useRho){
+HS_UpdatePropn_Single <- function(x, Z, nCell, nG, maxIter_prop, useRho){
   #----------------------------------------#
   # Extract Info                           #
   #----------------------------------------#
@@ -198,16 +158,17 @@ HS_UpdatePropn_Single <- function(x,Z,nCell,nG,maxIter_prop,useRho){
   # Initialize Values                      #
   #----------------------------------------#
   Zm = Z[,-c(1)]
-  Z_star = Zm%*%rbind(diag(rep(1,(Qval-1))),rep(-1,(Qval-1)))
+  Z_star = Zm %*% rbind(diag(rep(1,(Qval-1))), rep(-1,(Qval-1)))
   
-  eta_ij   = drop(Z%*%matrix(c(0,urho_1),ncol=1))
-  theta_ij = log(eta_ij)
+  eta_ij    = drop(Z %*% matrix(c(0,urho_1),ncol=1))
+  theta_ij  = log(eta_ij)
   Sigma2M_1 = HS_Sigma2_Update(logY   = logY,
                                eta_ij = eta_ij,
-                               EM_wgt = EM_wgt,AB_Up = FALSE)
+                               EM_wgt = EM_wgt, AB_Up = FALSE)
+  
   Sigma2A_1 = HS_Sigma2_Update(logY   = logY,
                                eta_ij = eta_ij,
-                               EM_wgt = EM_wgt,AB_Up = TRUE)
+                               EM_wgt = EM_wgt, AB_Up = TRUE)
   
   mu_ijM    = theta_ij - Sigma2M_1/2
   mu_ijA    = theta_ij - Sigma2A_1/2
@@ -227,20 +188,26 @@ HS_UpdatePropn_Single <- function(x,Z,nCell,nG,maxIter_prop,useRho){
     # Update Rho values                #
     #----------------------------------#
     if(useRho){
-      auglagOut = auglag(par = urho_0[-c(nCell)],fn = HS_ComputeLik_Fix,gr = HS_GradFunc_Fix,hin = hin_func_Fix,hin.jac = hin_jacob_Fix,
-                         logY = logY,rho_i0=rho_i0,Z=Z,Z_star=Z_star,Sigma2 = Sigma2M_0,
-                         Sigma2A = Sigma2A_0,EM_wgt=EM_wgt,
-                         control.optim=list(fnscale=-1),control.outer = list(trace=FALSE))
+      auglagOut = auglag(par = urho_0[-c(nCell)], fn = HS_ComputeLik_Fix, 
+                         gr = HS_GradFunc_Fix, hin = hin_func_Fix, 
+                         hin.jac = hin_jacob_Fix, logY = logY, 
+                         rho_i0 = rho_i0, Z=Z, Z_star = Z_star, 
+                         Sigma2 = Sigma2M_0, Sigma2A = Sigma2A_0, 
+                         EM_wgt = EM_wgt, control.optim = list(fnscale=-1), 
+                         control.outer = list(trace=FALSE))
       
       urho_1[c(1:(nCell-1))] = auglagOut$par
       urho_1[nCell] = 1-rho_i0-sum(auglagOut$par)
       
-      urho_1 = correctRho(est = urho_1,total = 1-rho_i0)
+      urho_1 = correctRho(est = urho_1, total = 1-rho_i0)
     } else {
-      auglagOut = auglag(par = urho_0,fn = HS_ComputeLik_noFix,gr = HS_GradFunc_noFix,hin = hin_func_noFix,hin.jac = hin_jacob_noFix,
-                         logY = logY,rho_i0=rho_i0,Z=Z,Z_star=Z_star,Sigma2 = Sigma2M_0,
-                         Sigma2A = Sigma2A_0,EM_wgt=EM_wgt,
-                         control.optim=list(fnscale=-1),control.outer = list(trace=FALSE))
+      auglagOut = auglag(par = urho_0, fn = HS_ComputeLik_noFix, 
+                         gr = HS_GradFunc_noFix, hin = hin_func_noFix, 
+                         hin.jac = hin_jacob_noFix, logY = logY, 
+                         rho_i0 = rho_i0, Z=Z, Z_star=Z_star, 
+                         Sigma2 = Sigma2M_0, Sigma2A = Sigma2A_0, 
+                         EM_wgt = EM_wgt, control.optim=list(fnscale=-1), 
+                         control.outer = list(trace=FALSE))
       
       urho_1 = auglagOut$par
       urho_1 = correctRho_v2(urho_1)
@@ -265,14 +232,18 @@ HS_UpdatePropn_Single <- function(x,Z,nCell,nG,maxIter_prop,useRho){
     
     if(max(abs(urho_1-urho_0)) < 1e-3){ break }
   }
-  return(list(rho_i = urho_1,iter=k,Sigma2M_i=Sigma2M_1,Sigma2A_i=Sigma2A_1))
+  return(list(rho_i=urho_1, iter=k, Sigma2M_i=Sigma2M_1, Sigma2A_i=Sigma2A_1))
 }
 
 #------------------- Update Multiple Subjects ----------------------#
-HS_UpdatePropn_All<-function(logY,Rho_init,fixed_rho,Z,maxIter_prop,EM_wgt,useRho){
-  PropnInfo = rbind(fixed_rho,Rho_init,logY,EM_wgt)
-  out = apply(X=PropnInfo,MARGIN = 2,FUN = HS_UpdatePropn_Single,Z=Z,useRho = useRho,
-              maxIter_prop = maxIter_prop,nCell=(nrow(Rho_init)),nG = nrow(logY))
+HS_UpdatePropn_All<-function(logY, Rho_init, fixed_rho, Z, maxIter_prop, 
+                             EM_wgt, useRho){
+  
+  PropnInfo = rbind(fixed_rho, Rho_init, logY, EM_wgt)
+  
+  out = apply(X=PropnInfo, MARGIN = 2, FUN = HS_UpdatePropn_Single, 
+              Z=Z, useRho = useRho, maxIter_prop = maxIter_prop, 
+              nCell=(nrow(Rho_init)), nG = nrow(logY))
   
   #--- Reshape Output ---#
   propMat   = extractFunction(compList = out,element = "rho_i")

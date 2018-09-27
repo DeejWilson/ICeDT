@@ -160,28 +160,35 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   Sigma2M_0 = Sigma2M_1
   Sigma2A_0 = Sigma2A_1
   
-  Z_0       = Z_1
-  
+  Z_0   = Z_1
   Pm_0  = Pm_1
 
   #------ Update Proportions + -----#
-  PropPlus_Out   = PropPlus_Update(Y = Y,Rho_0 = Rho_0,fixedCT_rho = fixedCT_rho,useRho=useRho,
-                                   Sigma2M_0 = Sigma2M_0,Sigma2A_0 = Sigma2A_0,
-                                   Z_0 = Z_0,Pm_0 = Pm_0,maxIter_PP = maxIter_PP,
-                                   maxIter_prop = maxIter_prop,nG = nG,
-                                   RhoConv_CO = RhoConv_CO,Subj_CO = Subj_CO)
+  PropPlus_Out   = PropPlus_Update(Y = Y, Rho_0 = Rho_0, 
+                                   fixedCT_rho = fixedCT_rho, 
+                                   useRho=useRho, 
+                                   Sigma2M_0 = Sigma2M_0, 
+                                   Sigma2A_0 = Sigma2A_0,
+                                   Z_0 = Z_0, Pm_0 = Pm_0, 
+                                   maxIter_PP = maxIter_PP, 
+                                   maxIter_prop = maxIter_prop, 
+                                   nG = nG,
+                                   RhoConv_CO = RhoConv_CO, 
+                                   Subj_CO = Subj_CO)
   
   Rho_1     = PropPlus_Out$Rho
   Sigma2M_1 = PropPlus_Out$Sigma2M
   Sigma2A_1 = PropPlus_Out$Sigma2A
   Pm_1      = PropPlus_Out$Pm
   
-  EM_wgt =  HS2_UpdateWgts_All(logY = log(Y),Rho_init = Rho_1,fixed_rho = fixedCT_rho,
-                               Sigma2M = Sigma2M_1,Sigma2A = Sigma2A_1,Z = Z_1,p_m = Pm_1)
+  EM_wgt =  HS2_UpdateWgts_All(logY = log(Y), Rho_init = Rho_1, 
+                               fixed_rho = fixedCT_rho, Sigma2M = Sigma2M_1, 
+                               Sigma2A = Sigma2A_1, Z = Z_1, p_m = Pm_1)
   
   #-----------------------------------------------------#
   # OUTPUT                                              #
   #-----------------------------------------------------#
+  
   if(useRho){
     fidx = which(sortCT==fixedCT)
     
@@ -214,10 +221,10 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   return(outList)
 }
 
-PropPlus_Update<- function(Y,Rho_0,fixedCT_rho,useRho,
-                           Sigma2M_0,Sigma2A_0,Z_0,Pm_0,
-                           maxIter_PP,maxIter_prop,nG,
-                           RhoConv_CO,Subj_CO){
+PropPlus_Update<- function(Y, Rho_0, fixedCT_rho, useRho,
+                           Sigma2M_0, Sigma2A_0, Z_0, Pm_0,
+                           maxIter_PP, maxIter_prop, nG,
+                           RhoConv_CO, Subj_CO){
   logY = log(Y)
   
   Rho_t1     = Rho_0
@@ -233,13 +240,16 @@ PropPlus_Update<- function(Y,Rho_0,fixedCT_rho,useRho,
     Pm_t0      = Pm_t1
     
     #---- Update EM Weights  ----#
-    EM_wgt = HS2_UpdateWgts_All(logY = logY,Rho_init = Rho_t0,fixed_rho = fixedCT_rho,
-                            Sigma2M = Sigma2M_t0,Sigma2A = Sigma2A_t0,Z = Z_0,p_m = Pm_t0)
+    EM_wgt = HS2_UpdateWgts_All(logY = logY, Rho_init = Rho_t0, 
+                                fixed_rho = fixedCT_rho, 
+                                Sigma2M = Sigma2M_t0, Sigma2A = Sigma2A_t0, 
+                                Z = Z_0, p_m = Pm_t0)
     
     #---- Update Proportions ----#
-    PropP_t1  = HS_UpdatePropn_All(logY = logY,Rho_init = Rho_t0,fixed_rho = fixedCT_rho,
-                                   Z = Z_0,maxIter_prop = maxIter_prop,EM_wgt = EM_wgt,
-                                   useRho = useRho)
+    PropP_t1  = HS_UpdatePropn_All(logY = logY, Rho_init = Rho_t0, 
+                                   fixed_rho = fixedCT_rho, 
+                                   Z = Z_0, maxIter_prop = maxIter_prop, 
+                                   EM_wgt = EM_wgt, useRho = useRho)
     
     Rho_t1     = PropP_t1$propCurr
     Sigma2M_t1 = PropP_t1$sig2M_Curr
@@ -259,5 +269,7 @@ PropPlus_Update<- function(Y,Rho_0,fixedCT_rho,useRho,
     message("Current PropPlus Iter ",j,": Max Diff of ",max(max_Diff))
   }
   
-  return(list(Rho = Rho_t1,Sigma2M = Sigma2M_t1,Sigma2A = Sigma2A_t1,Pm = Pm_t1,Iter = j))
+  return(list(Rho = Rho_t1, Sigma2M = Sigma2M_t1, Sigma2A = Sigma2A_t1, 
+              Pm = Pm_t1, Iter = j))
 }
+
