@@ -10,6 +10,9 @@ varFun <- function(x, group){
 }
 
 # COMMENT: why it is noRef, when X is given?
+# RESPONSE: X is a genes-by-samples matrix containing the pure
+#           sample expression data. Columns in X match entries
+#           in cellType. The matrix Z_1 represents the design matrix. 
 ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL, 
                                   fixedCT_rho = NULL, useRho = FALSE, 
                                   borrow4SD = TRUE, maxIter_prop = 100, 
@@ -22,6 +25,24 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   
   if(nrow(Y)!=nrow(X)){
     stop("Expression Inputs do not have the same number of genes!")
+  }
+  
+  #RESPONSE: To comment 3, added these checks and edits.
+  if(any(is.na(Y))|any(is.na(X))){
+     stop("Y and X must contain no NA entries. Please remove
+           any rows with NA and try again.")
+  }
+  if(any(Y<0)|any(X<0)){
+    stop("As normalized expression values, Y and X should be
+          non-negative. Please correct entries less than 0
+          and try again.")
+  }
+  if(any(Y<1e-4)|any(X<1e-4)){
+    message("X or Y contain expression values of 0. Adding
+             small correction (1e-5) to ensure log transformation
+             is viable.")
+    Y = Y+1e-5
+    X = X+1e-5
   }
   
   if(is.null(fixedCT)){
@@ -76,8 +97,18 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   # Remnant code which should not influence estimation as
   # seen later. It is not adjusted for the sake of 
   
-  # COMMENT: for the sake of what?
-  # COMMENT: what if some X is 0?
+  # COMMENT2: for the sake of what?
+  # RESPONSE: I believe this is a typo. In the noRef setting
+  #           this code is essential. I believe I was attempting
+  #           to remove this for the SuppRef setting, but 
+  #           decided to handle the noRef first and forgot 
+  #           about this comment. 
+  
+  # COMMENT3: what if some X is 0?
+  # RESPONSE: Very good point. Code should error out at the 
+  #           optimization phase, but I have inserted some 
+  #           checks above and default "fudge" factors to
+  #           account for zeroes. 
   logX = log(X) 
   
   CT_MU  = t(apply(X = logX, MARGIN = 1, FUN = meanFun, 
