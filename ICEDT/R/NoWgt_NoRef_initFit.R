@@ -82,7 +82,14 @@ AbProf_Init <- function(x, Z, nG, Qval){
   
   init_val = c(0,0)
   
-  # COMMENT: is g2use the initial set of abberant genes? what are init_val?
+  # COMMENT1: is g2use the initial set of abberant genes? what are init_val?
+  # RESPONSE: g2use is defined on line 81 above. It represents the first 
+  #           look at aberrant genes by selecting them from the the upper 
+  #           quartile of residuals from initial fit (worst fit 25%). 
+  #           The remaining 75% are considered "consistent marker genes".
+  #           init_val is a two dimensional vector with well consistent marker
+  #           gene variance estimate in position [1] and aberrant marker
+  #           gene variance in position [2]. 
   init_val[1] = HS_Sigma2_Update(logY = logY[-c(g2use)], 
                                  eta_ij = eta_ij[-c(g2use)],
                                  EM_wgt = rep(1,(nG-length(g2use))), 
