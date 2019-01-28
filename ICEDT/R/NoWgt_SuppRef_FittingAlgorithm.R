@@ -60,7 +60,7 @@
 #                |     2 -                                               #
 #========================================================================#
 
-ICeDT_fit_noWgt_suppRef<-function(Y,fixedCT_rho=NULL,useRho=FALSE,RefMat,
+ICeDT_fit_noWgt_suppRef<-function(Y,fixedCT_rho,useRho=FALSE,RefMat,
                                   maxIter_prop = 100, maxIter_PP=100,
                                   RhoConv_CO = 1e-4, Subj_CO){
   #-----------------------------------------------------#

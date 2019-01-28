@@ -107,7 +107,7 @@ medianFun <- function(x,group){
 #                |     2 -                                               #
 #========================================================================#
 
-ICeDT_fit_Wgt_suppRef<-function(Y,fixedCT_rho=NULL,useRho=FALSE,RefMat,RefVar,varLog=FALSE,
+ICeDT_fit_Wgt_suppRef<-function(Y,fixedCT_rho,useRho=FALSE,RefMat,RefVar,varLog=FALSE,
                                 limitWgt = TRUE,limitQuant=c(0.10,0.90),userWgt=NULL,
                                 useIQR=FALSE,maxIter_prop = 100,
                                 maxIter_PP=100,RhoConv_CO = 1e-4, Subj_CO){

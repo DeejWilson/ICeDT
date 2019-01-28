@@ -48,6 +48,14 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   if(is.null(fixedCT)){
     message("WARNING: No Fixed Cell Type Present!
             All Proportions will be estimated.")
+    if(is.null(fixedCT_rho)){
+      fixedCT_rho = rep(0,length(ncol(Y)))
+    } else if(length(fixedCT_rho)!=ncol(Y)){
+      stop("If providing fixedCT_rho as a starting point
+            for estimating tumor purity, please ensure
+            that it is the length of the number of columns
+            of Y.")
+    }
   } else {
     if(!(fixedCT %in% unique(cellType))){
       stop("Specified fixed cell type label is not
@@ -95,14 +103,16 @@ ICeDT_fit_noWgt_noRef <- function(Y, X, cellType, fixedCT = NULL,
   # Pure Sample Estimation                              #
   #-----------------------------------------------------#
   # Remnant code which should not influence estimation as
-  # seen later. It is not adjusted for the sake of 
+  # seen later. It is not adjusted for the sake of not
+  # breaking/introducing an error. Processing time
+  # not increased.
   
   # COMMENT2: for the sake of what?
-  # RESPONSE: I believe this is a typo. In the noRef setting
-  #           this code is essential. I believe I was attempting
-  #           to remove this for the SuppRef setting, but 
-  #           decided to handle the noRef first and forgot 
-  #           about this comment. 
+  # RESPONSE: This references the assumption that the 
+  #           user inputs some pure sample tumor cell
+  #           type expression (as was assumed under)
+  #           our original model. Warning message already
+  #           existed. 
   
   # COMMENT3: what if some X is 0?
   # RESPONSE: Very good point. Code should error out at the 
